@@ -1,3 +1,4 @@
+import boto3
 
 class WebVTTWriter(object):
 
@@ -19,6 +20,25 @@ class SRTWriter(object):
                                          self._to_srt_timestamp(caption.end_in_seconds)))
             f.writelines(['{}\n'.format(l) for l in caption.lines])
             f.write('\n')
+
+    # EkkertRBX
+    def write_srt_in_s3(self, captions, bucket, srtkey):
+        s3resource = boto3.resource('s3')
+        content = ""
+        for line_number, caption in enumerate(captions, start=1):
+            content += str(line_number) + '\n'
+            timestamp = ('{} --> {}'.format(self._to_srt_timestamp(caption.start_in_seconds),
+                                         self._to_srt_timestamp(caption.end_in_seconds)))
+            content += timestamp + '\n'
+            for l in caption.lines:
+                content += '{}\n'.format(l)
+            content += '\n'
+        # dt = datetime.now()
+        # sTag = '{:%Y-%m-%d %H:%M:%S}'.format(dt)
+        # sTag = "Converted=" + sTag
+        srts3 = s3resource.Object(bucket, srtkey)
+        # srts3.put(Body=content, Tagging=sTag)
+        srts3.put(Body=content)
 
     def _to_srt_timestamp(self, total_seconds):
         hours = int(total_seconds / 3600)

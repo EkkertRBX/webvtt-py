@@ -103,6 +103,10 @@ class WebVTT(object):
         with open(self.file, 'w', encoding='utf-8') as f:
             self.write(f, format='srt')
 
+    # EkkertRBX
+    def save_as_srt_in_s3(self, bucket, srtkey):
+        SRTWriter().write_srt_in_s3(self._captions,bucket, srtkey)
+
     def write(self, f, format='vtt'):
         if format == 'vtt':
             WebVTTWriter().write(self._captions, f)

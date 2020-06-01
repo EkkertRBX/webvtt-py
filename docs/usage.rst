@@ -48,6 +48,32 @@ Reading WebVTT caption files from file-like object
         print(caption.text)
 
 
+Reading WebVTT caption files from AWS S3
+----------------------------------------
+
+.. code-block:: python
+
+    import webvtt
+    import boto3
+    from io import StringIO
+
+    sBucket = 'convert-captions'
+    sKey = 'captions/movie1.vtt'
+
+    data = s3resource.Object(sBucket, sKey)
+    contents = data.get()['Body'].read()
+    if contents.startswith(codecs.BOM_UTF8):
+        contents = contents.decode('utf-8-sig')
+    else:
+        contents = contents.decode('utf-8')
+    buffer = StringIO(contents)
+
+    for caption in webvtt.read_buffer(buffer):
+        print(caption.start)
+        print(caption.end)
+        print(caption.text)
+
+
 Creating captions
 -----------------
 
@@ -154,3 +180,25 @@ Also we can convert WebVTT to other formats:
     # write to opened file in SRT format
     with open('my_captions.srt', 'w') as fd:
         vtt.write(fd, format='srt')
+
+
+We can convert WebVTT in AWS S3 to srt and save to AWS S3:
+
+.. code-block:: python
+
+    import webvtt
+    import boto3
+    from io import StringIO
+
+    sBucket = 'convert-captions'
+    sKey = 'captions/movie1.vtt'
+
+    data = s3resource.Object(sBucket, sKey)
+    contents = data.get()['Body'].read()
+    if contents.startswith(codecs.BOM_UTF8):
+        contents = contents.decode('utf-8-sig')
+    else:
+        contents = contents.decode('utf-8')
+    buffer = StringIO(contents)
+    ovtt = webvtt.read_buffer(buffer)
+    ovtt.save_as_srt_in_s3(sBucket, srtKey)

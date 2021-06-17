@@ -1,6 +1,12 @@
 History
 =======
 
+0.4.6 (18-11-2020)
+------------------
+
+* Add capability to get WebVTT formatted content without an output file, thanks to `@DawoudSheraz <https://github.com/DawoudSheraz>`_ (#34)
+* Add Python 3.9 support
+
 0.4.5 (09-04-2020)
 ------------------
 
